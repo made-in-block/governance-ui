@@ -1,10 +1,11 @@
-import { Container, Row, Spacer, Table, Col, Tooltip } from "@nextui-org/react";
+import { Container, Row, Spacer, Table, Col, Tooltip, Button } from "@nextui-org/react";
 import { IconButton } from './components/iconButton';
 import { EyeIcon } from './components/eyeIcon';
 import { EditIcon } from './components/editIcon';
 import { DeleteIcon } from './components/deleteIcon';
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { StyledBadge } from "./components/styledBadge";
 
 export default function Home() {
 
@@ -13,6 +14,7 @@ export default function Home() {
     { name: "Chain", uid: "chain_id" },
     { name: "Title", uid: "title", maxWidth: 200 },
     { name: "Voting End", uid: "voting_end" },
+    { name: "Status", uid: "status" },
     { name: "Actions", uid: "actions" },
   ];
   
@@ -20,7 +22,7 @@ export default function Home() {
 
   useEffect(() => {
 
-    axios.get("http://127.0.0.1:3001/active_proposals").then(res => {
+    axios.get("http://127.0.0.1:3001/active_proposals/juno1sjllsnramtg3ewxqwwrwjxfgc4n4ef9uee0aeq").then(res => {
       setProposals(res.data.data)
     });
    
@@ -30,6 +32,24 @@ export default function Home() {
     const cellValue = proposal[columnKey];
     switch (columnKey) {
   
+      case "status":
+        if (proposal.votes.length == 0) {
+          return <StyledBadge type="neutral">Missing Vote</StyledBadge>;
+        }
+
+        // check vote direction
+        switch (proposal.votes[0].option) {
+          case "YES":
+            return <StyledBadge type="success">Voted YES</StyledBadge>;
+          case "NO":
+            return <StyledBadge type="error">Voted NO</StyledBadge>;
+          case "VETO":
+            return <StyledBadge type="error">Voted NO WITH VETO</StyledBadge>;
+          case "ABSTAIN":
+            return <StyledBadge type="warning">Voted ABSTAIN</StyledBadge>;
+        }
+        
+        break;
       case "voting_end":
         return new Date(cellValue).toLocaleDateString() + " " + new Date(cellValue).toLocaleTimeString() ;
 
@@ -40,35 +60,7 @@ export default function Home() {
       return cellValue;
 
       case "actions":
-        return (
-          <Row justify="center" align="center">
-            <Col css={{ d: "flex" }}>
-              <Tooltip content="Details">
-                <IconButton onClick={() => console.log("View user", proposal.id)}>
-                  <EyeIcon size={20} fill="#979797" />
-                </IconButton>
-              </Tooltip>
-            </Col>
-            <Col css={{ d: "flex" }}>
-              <Tooltip content="Edit user">
-                <IconButton onClick={() => console.log("Edit user", proposal.id)}>
-                  <EditIcon size={20} fill="#979797" />
-                </IconButton>
-              </Tooltip>
-            </Col>
-            <Col css={{ d: "flex" }}>
-              <Tooltip
-                content="Delete user"
-                color="error"
-                onClick={() => console.log("Delete user", proposal.id)}
-              >
-                <IconButton>
-                  <DeleteIcon size={20} fill="#FF0080" />
-                </IconButton>
-              </Tooltip>
-            </Col>
-          </Row>
-        );
+        return <Button size="xs" auto>Vote</Button>
       default:
         return cellValue;
     }
@@ -76,6 +68,7 @@ export default function Home() {
 
   return (
     <Container>
+      <Spacer y={1} />
       <h1>stakefish 🐠 - governance proposals</h1>
       <Spacer y={1} />
      
