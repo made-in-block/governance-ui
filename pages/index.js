@@ -9,6 +9,9 @@ import { StyledBadge } from "./components/styledBadge";
 import { voteProposal } from "./libs/cosmos";
 import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov.js";
 import { getChainInfo } from "./libs/chains";
+import { DocumentIcon } from "./components/documentIcon";
+import { SwapIcon } from "./components/swapIcon";
+import { ChartIcon } from "./components/chartIcon";
 
 export default function Home() {
 
@@ -24,20 +27,35 @@ export default function Home() {
   const [proposals, setProposals] = useState([]);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [loadingAll, setLoadingAll] = useState(false);
 
-  const fetchProposals = () => {
-    axios.get("http://127.0.0.1:3001/active_proposals/juno1sjllsnramtg3ewxqwwrwjxfgc4n4ef9uee0aeq").then(res => {
-      setProposals(res.data.data)
-    });
+  const populateDb = async () => {
+    setFetching(true)
+    let res = await axios.get("http://127.0.0.1:3001/populate_db")
+    setMessage({type: "success", message: `${res.data.totalProps} proposals fetched from chain, ${res.data.newProps} new.`})
+    setFetching(false)
+  }
+
+  const fetchProposals = async (all = false) => {
+    if (all) {
+      setLoadingAll(true)
+    };
+
+    let path = all ? "proposals" : "active_proposals"
+    let res = await axios.get(`http://127.0.0.1:3001/${path}/juno1sjllsnramtg3ewxqwwrwjxfgc4n4ef9uee0aeq`)
+    setProposals(res.data.data)
+    setLoadingAll(false)
   }
 
   useEffect(() => {
-   fetchProposals()
-  }, [proposals])
+    fetchProposals()
+  }, [])
 
   const onClickVote = async (proposal, option) => {
     setLoading(true)
     setMessage(null)
+    await fetchProposals(); // We need this otherwise the stupid table will not re-render
 
     let chain = getChainInfo(proposal)
 
@@ -57,14 +75,14 @@ export default function Home() {
 
       setMessage({message: `Voted! TxHash: ${tx.transactionHash}`, type: "success"})
       
-      // Reload proposals
-      fetchProposals();
-
     } catch (error) {
       setMessage({message: `${error}`, type: "error"})
     }
 
     setLoading(false)
+
+    // Reload proposals
+    await fetchProposals();
   }
 
   const renderCell = (proposal, columnKey) => {
@@ -128,8 +146,27 @@ export default function Home() {
         </>
       }
 
+      <Row gap={1} justify="flex-end" align="flex-end">
+        <Col offset={9}>
+          {fetching && <Button disabled size="md" auto>
+              <Loading color="currentColor" size="sm" />
+            </Button>}
+          {!fetching && <Button onClick={() => {populateDb()}} size="md" auto icon={<SwapIcon fill="currentColor" filled />}>Update proposals</Button>}
+        </Col>
+        <Col>
+          {loadingAll && <Button disabled size="md" auto>
+              <Loading color="currentColor" size="sm" />
+            </Button>}
+          {!loadingAll && <Button onClick={() => {fetchProposals(true)}} color="secondary" size="md" auto icon={<DocumentIcon fill="currentColor" filled />} >History</Button>}
+        </Col>
+        <Col>
+          <Button color="gradient" size="md" auto icon={<ChartIcon fill="currentColor" filled />} >Reports</Button>
+        </Col>
+      </Row>
+      <Spacer y={1} />
+
       <Table
-        aria-label="Example table with custom cells"
+        aria-label="Proposal Table"
         css={{
           height: "auto",
           minWidth: "100%",
@@ -149,7 +186,7 @@ export default function Home() {
         </Table.Header>
         <Table.Body items={proposals}>
           {(item) => (
-            <Table.Row>
+            <Table.Row key={item.chain_id+"-"+item.id}>
               {(columnKey) => (
                 <Table.Cell>{renderCell(item, columnKey)}</Table.Cell>
               )}
