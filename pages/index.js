@@ -40,7 +40,7 @@ export default function Home() {
     let chain = getChainInfo(proposal)
 
     try {
-      var tx = await voteProposal(chain.chain_id, `https://rpc.cosmos.directory/${chain.name}`, "osmo1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u8slkgw", proposal.id, option)
+      var tx = await voteProposal(chain.chain_id, `https://rpc.cosmos.directory/${chain.name}`, chain.voter_address, proposal.id, option)
       setMessage({message: `Voted! TxHash: ${tx.transactionHash}`, type: "success"})
     } catch (error) {
       setMessage({message: `${error}`, type: "error"})
