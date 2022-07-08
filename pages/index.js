@@ -25,13 +25,15 @@ export default function Home() {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-
+  const fetchProposals = () => {
     axios.get("http://127.0.0.1:3001/active_proposals/juno1sjllsnramtg3ewxqwwrwjxfgc4n4ef9uee0aeq").then(res => {
       setProposals(res.data.data)
     });
-   
-  }, [])
+  }
+
+  useEffect(() => {
+   fetchProposals()
+  }, [proposals])
 
   const onClickVote = async (proposal, option) => {
     setLoading(true)
@@ -41,7 +43,23 @@ export default function Home() {
 
     try {
       var tx = await voteProposal(chain.chain_id, `https://rpc.cosmos.directory/${chain.name}`, chain.voter_address, proposal.id, option)
+
+      // Save result to database
+      const res = axios.post(`http://127.0.0.1:3001/vote/${chain.name}/${proposal.id}`, {
+        proposal_id: proposal.id,
+        chain_id: chain.name,
+        address: chain.voter_address,
+        option: option,
+        transaction_hash: tx.transactionHash,
+        block_height: 0,
+        date: new Date()
+      })
+
       setMessage({message: `Voted! TxHash: ${tx.transactionHash}`, type: "success"})
+      
+      // Reload proposals
+      fetchProposals();
+
     } catch (error) {
       setMessage({message: `${error}`, type: "error"})
     }
@@ -59,14 +77,14 @@ export default function Home() {
         }
 
         // check vote direction
-        switch (proposal.votes[0].option) {
-          case "YES":
+        switch (parseInt(proposal.votes[0].option)) {
+          case VoteOption.VOTE_OPTION_YES:
             return <StyledBadge type="success">Voted YES</StyledBadge>;
-          case "NO":
+          case VoteOption.VOTE_OPTION_NO:
             return <StyledBadge type="error">Voted NO</StyledBadge>;
-          case "VETO":
+          case VoteOption.VOTE_OPTION_NO_WITH_VETO:
             return <StyledBadge type="error">Voted NO WITH VETO</StyledBadge>;
-          case "ABSTAIN":
+          case VoteOption.VOTE_OPTION_ABSTAIN:
             return <StyledBadge type="warning">Voted ABSTAIN</StyledBadge>;
         }
         
