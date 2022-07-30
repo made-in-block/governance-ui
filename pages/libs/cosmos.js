@@ -43,7 +43,7 @@ export const voteProposal = async (chain_id, rpc, voter_address, proposal_id, op
         }, ],
         gas: '200000',
     }
-    
+
     return await client.signAndBroadcast(accounts[0].address, [buildExecMessage(accounts[0].address, [message])], fee, "")
 }
 

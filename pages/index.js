@@ -121,6 +121,8 @@ export default function Home() {
           <Col css={{ d: "flex" }}><Button disabled={loading} color="primary" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_YES)}}>Vote YES</Button></Col>
           <Col css={{ d: "flex" }}><Button disabled={loading} color="error" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_NO)}}>Vote NO</Button></Col>
           <Col css={{ d: "flex" }}><Button disabled={loading} color="warning" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_ABSTAIN)}}>Vote Abstain</Button></Col>
+          <Col css={{ d: "flex" }}><Button disabled={loading} color="error" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_NO_WITH_VETO)}}>Vote VETO</Button></Col>
+
         </Row>)
 
       default:
@@ -129,7 +131,7 @@ export default function Home() {
   };
 
   return (
-    <Container>
+    <Container xl>
       <Spacer y={1} />
       <h1>stakefish 🐠 - governance proposals</h1>
       <Spacer y={1} />
@@ -151,7 +153,7 @@ export default function Home() {
           {fetching && <Button disabled size="md" auto>
               <Loading color="currentColor" size="sm" />
             </Button>}
-          {!fetching && <Button onClick={() => {populateDb()}} size="md" auto icon={<SwapIcon fill="currentColor" filled />}>Update proposals</Button>}
+          {!fetching && <Button onClick={() => {populateDb()}} size="md" auto icon={<SwapIcon fill="currentColor" filled="true" />}>Update proposals</Button>}
         </Col>
         <Col>
           {loadingAll && <Button disabled size="md" auto>
@@ -160,7 +162,7 @@ export default function Home() {
           {!loadingAll && <Button onClick={() => {fetchProposals(true)}} color="secondary" size="md" auto icon={<DocumentIcon fill="currentColor" filled />} >History</Button>}
         </Col>
         <Col>
-          <Button color="gradient" size="md" auto icon={<ChartIcon fill="currentColor" filled />} >Reports</Button>
+          <Button color="gradient" size="md" auto icon={<ChartIcon fill="currentColor" filled="true" />} >Reports</Button>
         </Col>
       </Row>
       <Spacer y={1} />
@@ -177,7 +179,6 @@ export default function Home() {
           {(column) => (
             <Table.Column
               key={column.uid}
-              maxWidth={200}
               align={column.uid === "actions" ? "center" : "start"}
             >
               {column.name}
