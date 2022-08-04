@@ -1,17 +1,14 @@
 import { Container, Row, Spacer, Table, Col, Text, Button, Loading } from "@nextui-org/react";
-import { IconButton } from './components/iconButton';
-import { EyeIcon } from './components/eyeIcon';
-import { EditIcon } from './components/editIcon';
-import { DeleteIcon } from './components/deleteIcon';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { StyledBadge } from "./components/styledBadge";
 import { voteProposal } from "./libs/cosmos";
 import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov.js";
 import { getChainInfo } from "./libs/chains";
-import { DocumentIcon } from "./components/documentIcon";
-import { SwapIcon } from "./components/swapIcon";
-import { ChartIcon } from "./components/chartIcon";
+import { DocumentIcon } from "./components/icons/documentIcon";
+import { SwapIcon } from "./components/icons/swapIcon";
+import { ChartIcon } from "./components/icons/chartIcon";
+import Link from "next/link";
 
 export default function Home() {
 
@@ -23,7 +20,7 @@ export default function Home() {
     { name: "Status", uid: "status" },
     { name: "Actions", uid: "actions" },
   ];
-  
+
   const [proposals, setProposals] = useState([]);
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -33,7 +30,7 @@ export default function Home() {
   const populateDb = async () => {
     setFetching(true)
     let res = await axios.get("http://127.0.0.1:3001/populate_db")
-    setMessage({type: "success", message: `${res.data.totalProps} proposals fetched from chain, ${res.data.newProps} new.`})
+    setMessage({ type: "success", message: `${res.data.totalProps} proposals fetched from chain, ${res.data.newProps} new.` })
     setFetching(false)
   }
 
@@ -73,10 +70,10 @@ export default function Home() {
         date: new Date()
       })
 
-      setMessage({message: `Voted! TxHash: ${tx.transactionHash}`, type: "success"})
-      
+      setMessage({ message: `Voted! TxHash: ${tx.transactionHash}`, type: "success" })
+
     } catch (error) {
-      setMessage({message: `${error}`, type: "error"})
+      setMessage({ message: `${error}`, type: "error" })
     }
 
     setLoading(false)
@@ -88,7 +85,7 @@ export default function Home() {
   const renderCell = (proposal, columnKey) => {
     const cellValue = proposal[columnKey];
     switch (columnKey) {
-  
+
       case "status":
         if (proposal.votes.length == 0) {
           return <StyledBadge type="neutral">Missing Vote</StyledBadge>;
@@ -105,10 +102,10 @@ export default function Home() {
           case VoteOption.VOTE_OPTION_ABSTAIN:
             return <StyledBadge type="warning">Voted ABSTAIN</StyledBadge>;
         }
-        
+
         break;
       case "voting_end":
-        return new Date(cellValue).toLocaleDateString() + " " + new Date(cellValue).toLocaleTimeString() ;
+        return new Date(cellValue).toLocaleDateString() + " " + new Date(cellValue).toLocaleTimeString();
 
       case "title":
         if (cellValue.length > 80) {
@@ -118,10 +115,10 @@ export default function Home() {
 
       case "actions":
         return (<Row justify="center" align="center">
-          <Col css={{ d: "flex" }}><Button disabled={loading} color="primary" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_YES)}}>Vote YES</Button></Col>
-          <Col css={{ d: "flex" }}><Button disabled={loading} color="error" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_NO)}}>Vote NO</Button></Col>
-          <Col css={{ d: "flex" }}><Button disabled={loading} color="warning" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_ABSTAIN)}}>Vote Abstain</Button></Col>
-          <Col css={{ d: "flex" }}><Button disabled={loading} color="error" size="xs" auto onClick={() => {onClickVote(proposal, VoteOption.VOTE_OPTION_NO_WITH_VETO)}}>Vote VETO</Button></Col>
+          <Col css={{ d: "flex" }}><Button disabled={loading} color="primary" size="xs" auto onClick={() => { onClickVote(proposal, VoteOption.VOTE_OPTION_YES) }}>Vote YES</Button></Col>
+          <Col css={{ d: "flex" }}><Button disabled={loading} color="error" size="xs" auto onClick={() => { onClickVote(proposal, VoteOption.VOTE_OPTION_NO) }}>Vote NO</Button></Col>
+          <Col css={{ d: "flex" }}><Button disabled={loading} color="warning" size="xs" auto onClick={() => { onClickVote(proposal, VoteOption.VOTE_OPTION_ABSTAIN) }}>Vote Abstain</Button></Col>
+          <Col css={{ d: "flex" }}><Button disabled={loading} color="error" size="xs" auto onClick={() => { onClickVote(proposal, VoteOption.VOTE_OPTION_NO_WITH_VETO) }}>Vote VETO</Button></Col>
 
         </Row>)
 
@@ -136,33 +133,34 @@ export default function Home() {
       <h1>stakefish 🐠 - governance proposals</h1>
       <Spacer y={1} />
 
-      {loading && 
+      {loading &&
         <><Loading type="points" /><Spacer y={1} /></>
       }
 
       {message && <>
         <Text color={message.type}>
           {message.message}
-        </Text>  
+        </Text>
         <Spacer y={1} />
-        </>
+      </>
       }
 
       <Row gap={1} justify="flex-end" align="flex-end">
         <Col offset={9}>
           {fetching && <Button disabled size="md" auto>
-              <Loading color="currentColor" size="sm" />
-            </Button>}
-          {!fetching && <Button onClick={() => {populateDb()}} size="md" auto icon={<SwapIcon fill="currentColor" filled="true" />}>Update proposals</Button>}
+            <Loading color="currentColor" size="sm" />
+          </Button>}
+          {!fetching && <Button onClick={() => { populateDb() }} size="md" auto icon={<SwapIcon fill="currentColor" filled="true" />}>Update proposals</Button>}
         </Col>
         <Col>
           {loadingAll && <Button disabled size="md" auto>
-              <Loading color="currentColor" size="sm" />
-            </Button>}
-          {!loadingAll && <Button onClick={() => {fetchProposals(true)}} color="secondary" size="md" auto icon={<DocumentIcon fill="currentColor" filled />} >History</Button>}
+            <Loading color="currentColor" size="sm" />
+          </Button>}
+          {!loadingAll && <Button onClick={() => { fetchProposals(true) }} color="secondary" size="md" auto icon={<DocumentIcon fill="currentColor" filled="true" />} >History</Button>}
         </Col>
         <Col>
-          <Button color="gradient" size="md" auto icon={<ChartIcon fill="currentColor" filled="true" />} >Reports</Button>
+          <Link href="/reports">
+            <Button color="gradient" size="md" auto icon={<ChartIcon fill="currentColor" filled="true" />} >Reports</Button></Link>
         </Col>
       </Row>
       <Spacer y={1} />
@@ -187,7 +185,7 @@ export default function Home() {
         </Table.Header>
         <Table.Body items={proposals}>
           {(item) => (
-            <Table.Row key={item.chain_id+"-"+item.id}>
+            <Table.Row key={item.chain_id + "-" + item.id}>
               {(columnKey) => (
                 <Table.Cell>{renderCell(item, columnKey)}</Table.Cell>
               )}
