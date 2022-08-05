@@ -9,6 +9,7 @@ import { DocumentIcon } from "./components/icons/documentIcon";
 import { SwapIcon } from "./components/icons/swapIcon";
 import { ChartIcon } from "./components/icons/chartIcon";
 import Link from "next/link";
+import { renderPropIDCell } from "./libs/renderers";
 
 export default function Home() {
 
@@ -29,7 +30,7 @@ export default function Home() {
 
   const populateDb = async () => {
     setFetching(true)
-    let res = await axios.get("http://127.0.0.1:3001/populate_db")
+    let res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/populate_db`)
     setMessage({ type: "success", message: `${res.data.totalProps} proposals fetched from chain, ${res.data.newProps} new.` })
     setFetching(false)
   }
@@ -40,7 +41,7 @@ export default function Home() {
     };
 
     let path = all ? "proposals" : "active_proposals"
-    let res = await axios.get(`http://127.0.0.1:3001/${path}/juno1sjllsnramtg3ewxqwwrwjxfgc4n4ef9uee0aeq`)
+    let res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/${path}/juno1sjllsnramtg3ewxqwwrwjxfgc4n4ef9uee0aeq`)
     setProposals(res.data.data)
     setLoadingAll(false)
   }
@@ -85,6 +86,9 @@ export default function Home() {
   const renderCell = (proposal, columnKey) => {
     const cellValue = proposal[columnKey];
     switch (columnKey) {
+
+      case "id":
+        return renderPropIDCell(proposal.id, proposal.chain_id);
 
       case "status":
         if (proposal.votes.length == 0) {

@@ -6,6 +6,7 @@ import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov.js";
 import { DocumentIcon } from "./components/icons/documentIcon";
 import Link from "next/link";
 import { getCurrentWeek, getWeekCount } from "./libs/weeks";
+import { renderPropIDCell } from "./libs/renderers";
 
 export default function Home() {
 
@@ -33,19 +34,26 @@ export default function Home() {
             return;
         }
 
-        let path = `votes/${selectedYear}/${week}`
-        let res = await axios.get(`http://127.0.0.1:3001/${path}`)
-
-        setVotes(res.data.votes)
-        setWeekDates({monday: res.data.monday, sunday: res.data.sunday})
+        try {
+            let path = `votes/${selectedYear}/${week}`
+            let res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/${path}`)
+    
+            setVotes(res.data.votes)
+            setWeekDates({monday: res.data.monday, sunday: res.data.sunday})
+        } catch (error) {
+            setMessage({type: "error", message: "Error " + error})
+        }
     }
 
     useEffect(() => {
         // Set current week
-        setWeek(getCurrentWeek())
         fetchVotes()
         
     }, [ week, year ])
+
+    useEffect(() => {
+        setWeek(getCurrentWeek())
+    }, []);
 
     const selectedYear = useMemo(
         () => Array.from(year).join(", "),
@@ -59,6 +67,9 @@ export default function Home() {
   const renderCell = (vote, columnKey) => {
     const cellValue = vote[columnKey];
     switch (columnKey) {
+    
+        case "proposal_id":
+            return renderPropIDCell(vote.proposal_id, vote.chain_id);
 
       case "status":
 

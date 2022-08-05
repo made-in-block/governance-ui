@@ -13,3 +13,7 @@ export const CHAINS = [
 export const getChainInfo = (proposal) => {
     return CHAINS.find((el) => el.name == proposal.chain_id)
 }
+
+export const getChainByName = (name) => {
+  return CHAINS.find((el) => el.name == name)
+}
