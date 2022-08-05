@@ -5,7 +5,7 @@ import { StyledBadge } from "./components/styledBadge";
 import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov.js";
 import { DocumentIcon } from "./components/icons/documentIcon";
 import Link from "next/link";
-import { getWeekCount } from "./libs/weeks";
+import { getCurrentWeek, getWeekCount } from "./libs/weeks";
 
 export default function Home() {
 
@@ -29,7 +29,6 @@ export default function Home() {
 
     const fetchVotes = async () => {
 
-        console.log(parseInt(week))
         if (isNaN(parseInt(week))) {
             return;
         }
@@ -42,7 +41,10 @@ export default function Home() {
     }
 
     useEffect(() => {
+        // Set current week
+        setWeek(getCurrentWeek())
         fetchVotes()
+        
     }, [ week, year ])
 
     const selectedYear = useMemo(

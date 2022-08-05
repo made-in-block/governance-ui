@@ -1,4 +1,5 @@
 
+// Get count of weeks of a given year
 export const getWeekCount = (year) => {
 
     // Check when this year start
@@ -11,6 +12,18 @@ export const getWeekCount = (year) => {
     let timeDiff = firstWeekMondayNext.getTime() - firstWeekMonday.getTime();
 
     return timeDiff / (1000 * 3600 * 24) / 7
+}
+
+// Get current week
+export const getCurrentWeek = () => {
+    let today = new Date()
+
+    // Check when this year start
+    let firstWeekMonday = getMondayOfWeek(today.getUTCFullYear(), 1);
+
+    let timeDiff = today.getTime() - firstWeekMonday.getTime();
+
+    return Math.ceil(timeDiff / (1000 * 3600 * 24) / 7)
 }
 
 // ISO-8601 filter i.e. 2022-W21
