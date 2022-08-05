@@ -1,13 +1,9 @@
 import { Container, Row, Spacer, Table, Col, Text, Button, Loading, Input, Dropdown, Grid } from "@nextui-org/react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
 import { StyledBadge } from "./components/styledBadge";
-import { voteProposal } from "./libs/cosmos";
 import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov.js";
-import { getChainInfo } from "./libs/chains";
 import { DocumentIcon } from "./components/icons/documentIcon";
-import { SwapIcon } from "./components/icons/swapIcon";
-import { ChartIcon } from "./components/icons/chartIcon";
 import Link from "next/link";
 import { getWeekCount } from "./libs/weeks";
 
@@ -26,51 +22,37 @@ export default function Home() {
 
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [weekDates, setWeekDates] = useState(null);
 
-    const [week, setWeek] = useState(new Set(["31"]));
-    const [weekCount, setWeekCount] = useState([]);
+    const [week, setWeek] = useState("31");
     const [year, setYear] = useState(new Set(["2022"]));
 
-    const initWeeks = (_year) => {
-        const weeks = [...Array(getWeekCount(_year)).keys()]
-        
-        setWeekCount(weeks.map((el, index) => {
-            return {key: index+1, name: "W" + (index+1).toString().padStart(2, "0")}
-        }))
-    }
-
     const fetchVotes = async () => {
-        let path = `votes/${selectedYear}/${selectedWeek}`
+
+        console.log(parseInt(week))
+        if (isNaN(parseInt(week))) {
+            return;
+        }
+
+        let path = `votes/${selectedYear}/${week}`
         let res = await axios.get(`http://127.0.0.1:3001/${path}`)
 
         setVotes(res.data.votes)
+        setWeekDates({monday: res.data.monday, sunday: res.data.sunday})
     }
 
     useEffect(() => {
         fetchVotes()
-        initWeeks("2022")
-    }, [])
+    }, [ week, year ])
 
     const selectedYear = useMemo(
         () => Array.from(year).join(", "),
         [year]
       );
 
-    const selectedWeek = useMemo(
-        () => Array.from(week).join(", "),
-        [week]
-      );
-
     const changeYear = (value) => {
         setYear(value)
-        initWeeks(selectedYear)
     }
-
-    const changeWeek = (value) => {
-        setWeek(value)
-        fetchVotes()
-    }
-
 
   const renderCell = (vote, columnKey) => {
     const cellValue = vote[columnKey];
@@ -126,17 +108,15 @@ export default function Home() {
 
             <Row gap={1} justify="flex-end" align="flex-end">
                 <Col offset={11}>
-                    <Link href="/">
-                        <Button color="gradient" size="md" auto icon={<DocumentIcon fill="currentColor" filled="true" />} >Proposal List</Button>
-                    </Link>
+                    
                 </Col>
             </Row>
             <Spacer y={1} />
 
 
             <Grid.Container gap={1} >
-                <Grid xs={1}>
-                    <Dropdown>
+                <Grid md={4}>
+                    <Dropdown labelPlaceholder="Year">
                         <Dropdown.Button flat>{selectedYear}</Dropdown.Button>
                         <Dropdown.Menu aria-label="Year" selectionMode="single" onSelectionChange={changeYear} selectedKeys={year}>
                             <Dropdown.Item key="2022">2022</Dropdown.Item>
@@ -145,22 +125,23 @@ export default function Home() {
                             <Dropdown.Item key="2019">2019</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
-                </Grid>
 
-                <Grid  xs={1}>
-                    <Dropdown>
-                        <Dropdown.Button flat>W{selectedWeek.padStart(2, "0")}</Dropdown.Button>
-                        <Dropdown.Menu aria-label="Year" selectionMode="single" onSelectionChange={changeWeek} selectedKeys={year} items={weekCount}>
-                        {(item) => (
-                            <Dropdown.Item
-                                key={item.key}
-                                color={item.key === "delete" ? "error" : "default"}
-                            >
-                                {item.name}
-                            </Dropdown.Item>
-                            )}
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <Spacer y="1" />
+                    <Input bordered labelPlaceholder="Week" color="primary" value={week} onChange={(e) => setWeek(e.target.value)} />
+
+                    {weekDates && (
+                        <>
+                            <Spacer y="1" />
+                            Showing votes between {new Date(weekDates.monday).toLocaleDateString()} and {new Date(weekDates.sunday).toLocaleDateString()}
+                        </>
+                    )}
+                    
+                </Grid>
+                <Grid md={7}></Grid>
+                <Grid md={1}>
+                    <Link href="/">
+                        <Button color="gradient" size="md" auto icon={<DocumentIcon fill="currentColor" filled="true" />} >Proposal List</Button>
+                    </Link>
                 </Grid>
             </Grid.Container>
 
