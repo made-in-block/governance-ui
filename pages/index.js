@@ -60,16 +60,19 @@ export default function Home() {
     try {
       var tx = await voteProposal(chain.chain_id, `https://rpc.cosmos.directory/${chain.name}`, chain.voter_address, proposal.id, option)
 
-      // Save result to database
-      const res = axios.post(`http://127.0.0.1:3001/vote/${chain.name}/${proposal.id}`, {
-        proposal_id: proposal.id,
-        chain_id: chain.name,
-        address: chain.voter_address,
-        option: option,
-        transaction_hash: tx.transactionHash,
-        block_height: 0,
-        date: new Date()
-      })
+      // {code: 11, height: 5481083, rawLog: 'out of gas in location: ReadPerByte; gasWanted: 200000, gasUsed: 315796: out of gas', transactionHash: '42E719587E4FB45F294B3A02B4F552D870A52D1DB7335D7725FE47E81BB8C975', gasUsed: 315796, …}code: 11gasUsed: 315796gasWanted: 200000height: 5481083rawLog: "out of gas in location: ReadPerByte; gasWanted: 200000, gasUsed: 315796: out of gas"transactionHash: "42E719587E4FB45F294B3A02B4F552D870A52D1DB7335D7725FE47E81BB8C975"[[Prototype]]: Object
+      // {code: 0, height: 5481095, rawLog: '[{"events":[{"type":"message","attributes":[{"key"…000\\"}"},{"key":"proposal_id","value":"305"}]}]}]', transactionHash: '2A9467C0CAD5F892CC48C51E07B7274937BA48D9EA451AAD8533BF9CBFA6733E', gasUsed: 320857, …}
+
+      if (tx.code != 0) {
+        throw (Error(`Transaction error ${tx.rawLog}. ${tx.transactionHash}`))
+      }
+
+      // Index transaction in database
+      const res = await axios.put(`http://127.0.0.1:3001/index_tx/${tx.transactionHash}`, {
+        chain_name: chain.name
+      });
+
+      console.log(res)
 
       setMessage({ message: `Voted! TxHash: ${tx.transactionHash}`, type: "success" })
 

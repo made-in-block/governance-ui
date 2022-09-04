@@ -8,6 +8,7 @@ export const CHAINS = [
     { name: 'persistence', chain_id: 'core-1', prefix: 'persistence', voter_address: "persistence1a8e70jds75rftrs9e5d2qmu4y38d3km7yxhns2" },
     { name: 'evmos', chain_id: 'evmos_9001-2', prefix: 'evmos', voter_address: "evmos1tcty2k97cdv5sc6xcdf2atrrxq0zg7vvl2xq67" },
     { name: 'regen', chain_id: 'regen-1', prefix: 'regen', voter_address: "regen15qepg86xxesg7k633ent5t9vaweyf5zt5fhyuc" },
+    { name: 'sentinel', chain_id: 'sentinelhub-2', prefix: 'sent', voter_address: "sent15nr70ed65h8gnwpn879u8pvtjcy7mt6cy4qatm" },
   ];
 
 export const getChainInfo = (proposal) => {
