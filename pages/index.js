@@ -137,7 +137,7 @@ export default function Home() {
   return (
     <Container xl>
       <Spacer y={1} />
-      <h1>stakefish 🐠 - governance proposals</h1>
+      <h1>MiB 🛸 - governance proposals</h1>
       <Spacer y={1} />
 
       {loading &&
