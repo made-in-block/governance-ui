@@ -68,7 +68,7 @@ export default function Home() {
       }
 
       // Index transaction in database
-      const res = await axios.put(`http://127.0.0.1:3001/index_tx/${tx.transactionHash}`, {
+      const res = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/index_tx/${tx.transactionHash}`, {
         chain_name: chain.name
       });
 
