@@ -1,12 +1,12 @@
 import { Container, Row, Spacer, Table, Col, Text, Button, Loading, Input, Dropdown, Grid } from "@nextui-org/react";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import axios from "axios";
-import { StyledBadge } from "./components/styledBadge";
+import { StyledBadge } from "../components/styledBadge";
 import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov.js";
-import { DocumentIcon } from "./components/icons/documentIcon";
+import { DocumentIcon } from "../components/icons/documentIcon";
 import Link from "next/link";
-import { getCurrentWeek, getWeekCount } from "./libs/weeks";
-import { renderPropIDCell } from "./libs/renderers";
+import { getCurrentWeek, getWeekCount } from "../libs/weeks";
+import { renderPropIDCell } from "../libs/renderers";
 
 export default function Home() {
 

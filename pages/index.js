@@ -1,13 +1,13 @@
 import { Container, Row, Spacer, Table, Col, Text, Button, Loading } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { StyledBadge } from "./components/styledBadge";
-import { voteProposal } from "./libs/cosmos";
+import { StyledBadge } from "../components/styledBadge";
+import { voteProposal } from "../libs/cosmos";
 import { VoteOption } from "cosmjs-types/cosmos/gov/v1beta1/gov.js";
-import { getChainInfo } from "./libs/chains";
-import { DocumentIcon } from "./components/icons/documentIcon";
-import { SwapIcon } from "./components/icons/swapIcon";
-import { ChartIcon } from "./components/icons/chartIcon";
+import { getChainInfo } from "../libs/chains";
+import { DocumentIcon } from "../components/icons/documentIcon";
+import { SwapIcon } from "../components/icons/swapIcon";
+import { ChartIcon } from "../components/icons/chartIcon";
 import Link from "next/link";
 import { renderPropIDCell } from "./libs/renderers";
 

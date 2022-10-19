@@ -1,4 +1,4 @@
-import { React } from '@nextui-org/react';
+.import { React } from '@nextui-org/react';
 
 export const ChartIcon = ({
   fill,
