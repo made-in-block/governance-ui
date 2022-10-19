@@ -9,7 +9,7 @@ import { DocumentIcon } from "../components/icons/documentIcon";
 import { SwapIcon } from "../components/icons/swapIcon";
 import { ChartIcon } from "../components/icons/chartIcon";
 import Link from "next/link";
-import { renderPropIDCell } from "./libs/renderers";
+import { renderPropIDCell } from "../libs/renderers";
 
 export default function Home() {
 
